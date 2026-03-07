@@ -1,197 +1,1030 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shuvodip Biswas | Researcher Portfolio</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="style.css">
-    <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shuvodip Biswas | Cybersecurity Researcher</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0c10;
+      --surface: #111318;
+      --surface2: #181c24;
+      --border: #1f2530;
+      --accent: #00e5a0;
+      --accent2: #0077ff;
+      --warn: #ff5c5c;
+      --text: #e4e8f0;
+      --muted: #6b7589;
+      --mono: 'Space Mono', monospace;
+      --sans: 'DM Sans', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
+
+    /* ── NOISE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: .4;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: rgba(10,12,16,.85);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-logo {
+      font-family: var(--mono);
+      font-size: .85rem;
+      color: var(--accent);
+      text-decoration: none;
+      letter-spacing: .05em;
+    }
+    .nav-logo span { color: var(--muted); }
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+    .nav-links a {
+      font-family: var(--mono);
+      font-size: .75rem;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      transition: color .2s;
+      position: relative;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px; left: 0;
+      width: 0; height: 1px;
+      background: var(--accent);
+      transition: width .3s;
+    }
+    .nav-links a:hover { color: var(--accent); }
+    .nav-links a:hover::after { width: 100%; }
+
+    /* hamburger */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 4px;
+    }
+    .hamburger span {
+      display: block;
+      width: 22px; height: 2px;
+      background: var(--text);
+      border-radius: 2px;
+      transition: all .3s;
+    }
+    .nav-mobile {
+      display: none;
+      flex-direction: column;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 1rem 2rem;
+      gap: .5rem;
+    }
+    .nav-mobile.open { display: flex; }
+    .nav-mobile a {
+      font-family: var(--mono);
+      font-size: .8rem;
+      color: var(--muted);
+      text-decoration: none;
+      padding: .5rem 0;
+      border-bottom: 1px solid var(--border);
+      transition: color .2s;
+    }
+    .nav-mobile a:hover { color: var(--accent); }
+
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+    }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 6rem 2rem 4rem;
+      max-width: 1100px;
+      margin: 0 auto;
+      position: relative;
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+      width: 100%;
+    }
+    .hero-tag {
+      font-family: var(--mono);
+      font-size: .75rem;
+      color: var(--accent);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+    .hero-tag::before {
+      content: '';
+      display: inline-block;
+      width: 28px; height: 1px;
+      background: var(--accent);
+    }
+    h1.hero-name {
+      font-family: var(--mono);
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 700;
+      line-height: 1.15;
+      color: var(--text);
+      margin-bottom: .6rem;
+    }
+    h1.hero-name .accent { color: var(--accent); }
+    .hero-title {
+      font-size: 1rem;
+      color: var(--muted);
+      font-weight: 400;
+      margin-bottom: 1.8rem;
+      font-family: var(--mono);
+    }
+    .hero-bio {
+      color: #9aa3b4;
+      font-size: .95rem;
+      line-height: 1.8;
+      margin-bottom: 2.4rem;
+      max-width: 480px;
+    }
+    .hero-cta {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #000;
+      font-family: var(--mono);
+      font-size: .78rem;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      padding: .75rem 1.6rem;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: opacity .2s, transform .2s;
+      clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+    }
+    .btn-primary:hover { opacity: .85; transform: translateY(-2px); }
+    .btn-ghost {
+      background: transparent;
+      color: var(--accent);
+      font-family: var(--mono);
+      font-size: .78rem;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      padding: .72rem 1.6rem;
+      border: 1px solid var(--accent);
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: background .2s, color .2s;
+    }
+    .btn-ghost:hover { background: rgba(0,229,160,.08); }
+
+    /* Hero visual */
+    .hero-visual {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .terminal-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      width: 100%;
+      max-width: 420px;
+      overflow: hidden;
+      box-shadow: 0 24px 80px rgba(0,0,0,.6), 0 0 60px rgba(0,229,160,.04);
+    }
+    .terminal-header {
+      background: var(--surface2);
+      padding: .6rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot.red { background: #ff5f57; }
+    .dot.yellow { background: #febc2e; }
+    .dot.green { background: #28c840; }
+    .terminal-title { font-family: var(--mono); font-size: .7rem; color: var(--muted); margin-left: .5rem; }
+    .terminal-body { padding: 1.4rem; font-family: var(--mono); font-size: .8rem; line-height: 1.9; }
+    .t-prompt { color: var(--accent); }
+    .t-cmd { color: var(--text); }
+    .t-out { color: var(--muted); }
+    .t-key { color: var(--accent2); }
+    .t-val { color: #f0c070; }
+    .t-cursor {
+      display: inline-block;
+      width: 8px; height: 14px;
+      background: var(--accent);
+      animation: blink 1s infinite;
+      vertical-align: -2px;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* ── SECTION COMMON ── */
+    section { padding: 6rem 2rem; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    .section-label {
+      font-family: var(--mono);
+      font-size: .72rem;
+      color: var(--accent);
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      margin-bottom: .5rem;
+    }
+    .section-title {
+      font-family: var(--mono);
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      font-weight: 700;
+      margin-bottom: 3rem;
+      color: var(--text);
+    }
+    .section-title span { color: var(--accent); }
+    .divider {
+      width: 40px; height: 2px;
+      background: var(--accent);
+      margin-bottom: 3rem;
+    }
+
+    /* ── ABOUT / STATS ── */
+    #about { background: var(--surface); }
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: start;
+    }
+    .about-text p {
+      color: #9aa3b4;
+      margin-bottom: 1.2rem;
+      font-size: .95rem;
+    }
+    .about-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem;
+    }
+    .stat-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      padding: 1.2rem;
+    }
+    .stat-num {
+      font-family: var(--mono);
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: .3rem;
+    }
+    .stat-label { font-size: .8rem; color: var(--muted); }
+
+    /* ── SKILLS ── */
+    #skills { background: var(--bg); }
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+    .skill-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 1.8rem;
+      position: relative;
+      overflow: hidden;
+      transition: border-color .3s, transform .3s;
+    }
+    .skill-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 0; height: 2px;
+      background: var(--accent);
+      transition: width .4s;
+    }
+    .skill-card:hover { border-color: rgba(0,229,160,.3); transform: translateY(-4px); }
+    .skill-card:hover::before { width: 100%; }
+    .skill-icon {
+      font-size: 1.4rem;
+      margin-bottom: 1rem;
+    }
+    .skill-card h4 {
+      font-family: var(--mono);
+      font-size: .85rem;
+      color: var(--text);
+      margin-bottom: .8rem;
+      letter-spacing: .04em;
+    }
+    .skill-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .4rem;
+    }
+    .tag {
+      background: rgba(0,229,160,.08);
+      border: 1px solid rgba(0,229,160,.2);
+      color: var(--accent);
+      font-family: var(--mono);
+      font-size: .68rem;
+      padding: .2rem .6rem;
+      letter-spacing: .04em;
+    }
+    .tag.blue {
+      background: rgba(0,119,255,.08);
+      border-color: rgba(0,119,255,.2);
+      color: var(--accent2);
+    }
+    .tag.red {
+      background: rgba(255,92,92,.08);
+      border-color: rgba(255,92,92,.2);
+      color: var(--warn);
+    }
+
+    /* ── EXPERIENCE ── */
+    #experience { background: var(--surface); }
+    .timeline {
+      position: relative;
+      padding-left: 2rem;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 1px;
+      background: linear-gradient(to bottom, var(--accent), transparent);
+    }
+    .tl-item {
+      position: relative;
+      margin-bottom: 3rem;
+      padding-left: 1.5rem;
+    }
+    .tl-item::before {
+      content: '';
+      position: absolute;
+      left: -2rem;
+      top: .4rem;
+      width: 9px; height: 9px;
+      background: var(--accent);
+      border: 2px solid var(--bg);
+      border-radius: 50%;
+    }
+    .tl-meta {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: .5rem;
+      flex-wrap: wrap;
+    }
+    .tl-date {
+      font-family: var(--mono);
+      font-size: .72rem;
+      color: var(--muted);
+      letter-spacing: .06em;
+    }
+    .tl-badge {
+      font-family: var(--mono);
+      font-size: .65rem;
+      padding: .15rem .5rem;
+      background: rgba(0,229,160,.1);
+      color: var(--accent);
+      border: 1px solid rgba(0,229,160,.25);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .tl-badge.blue {
+      background: rgba(0,119,255,.1);
+      color: var(--accent2);
+      border-color: rgba(0,119,255,.25);
+    }
+    .tl-title {
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: .2rem;
+    }
+    .tl-org {
+      font-size: .85rem;
+      color: var(--accent);
+      margin-bottom: .8rem;
+    }
+    .tl-points {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: .4rem;
+    }
+    .tl-points li {
+      font-size: .875rem;
+      color: #8a93a8;
+      padding-left: 1rem;
+      position: relative;
+    }
+    .tl-points li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-size: .75rem;
+    }
+
+    /* ── PUBLICATIONS / PROJECTS ── */
+    #projects { background: var(--bg); }
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+    .project-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      transition: border-color .3s, transform .3s;
+      position: relative;
+    }
+    .project-card:hover { border-color: rgba(0,229,160,.35); transform: translateY(-5px); }
+    .project-card-header {
+      padding: 1.2rem 1.4rem .6rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .project-type {
+      font-family: var(--mono);
+      font-size: .65rem;
+      color: var(--accent);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+    .project-status {
+      font-family: var(--mono);
+      font-size: .62rem;
+      padding: .15rem .55rem;
+      letter-spacing: .06em;
+    }
+    .status-published {
+      background: rgba(0,229,160,.12);
+      color: var(--accent);
+      border: 1px solid rgba(0,229,160,.3);
+    }
+    .status-submitted {
+      background: rgba(0,119,255,.1);
+      color: var(--accent2);
+      border: 1px solid rgba(0,119,255,.25);
+    }
+    .status-ongoing {
+      background: rgba(255,92,92,.08);
+      color: var(--warn);
+      border: 1px solid rgba(255,92,92,.2);
+    }
+    .project-card-body { padding: .6rem 1.4rem 1.4rem; }
+    .project-card h5 {
+      font-family: var(--mono);
+      font-size: .88rem;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.4;
+      margin-bottom: .8rem;
+    }
+    .project-card p {
+      font-size: .83rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+    .project-venue {
+      margin-top: .8rem;
+      font-family: var(--mono);
+      font-size: .72rem;
+      color: var(--accent2);
+    }
+
+    /* ── CONTACT ── */
+    #contact { background: var(--surface); }
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 4rem;
+      align-items: start;
+    }
+    .contact-info p {
+      color: #8a93a8;
+      font-size: .9rem;
+      margin-bottom: 2rem;
+    }
+    .contact-links { display: flex; flex-direction: column; gap: .8rem; }
+    .contact-link {
+      display: flex;
+      align-items: center;
+      gap: .8rem;
+      font-family: var(--mono);
+      font-size: .8rem;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color .2s;
+    }
+    .contact-link:hover { color: var(--accent); }
+    .contact-link-icon {
+      width: 32px; height: 32px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .9rem;
+    }
+    .contact-form { display: flex; flex-direction: column; gap: 1rem; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-field { display: flex; flex-direction: column; gap: .4rem; }
+    .form-field label {
+      font-family: var(--mono);
+      font-size: .7rem;
+      color: var(--muted);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .form-field input,
+    .form-field textarea {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: .9rem;
+      padding: .75rem 1rem;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .form-field input:focus,
+    .form-field textarea:focus { border-color: var(--accent); }
+    .form-field textarea { resize: vertical; min-height: 130px; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      padding: 2rem;
+      text-align: center;
+    }
+    footer p {
+      font-family: var(--mono);
+      font-size: .72rem;
+      color: var(--muted);
+      letter-spacing: .06em;
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+
+    /* ── FADE IN ── */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity .6s ease, transform .6s ease;
+    }
+    .fade-in.visible { opacity: 1; transform: none; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .hero-grid, .about-grid, .contact-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+      .hero-visual { display: none; }
+      .skills-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 600px) {
+      .skills-grid { grid-template-columns: 1fr; }
+      .about-stats { grid-template-columns: 1fr 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
-
 <body>
-    <!-- Hero Section
-    <header class="hero-section text-white text-center d-flex flex-column justify-content-center align-items-center">
-        <img src="assets/my-photo.png" alt="Shuvodip Biswas" class="profile-pic">
-        <h1 class="mt-4">Shuvodip Biswas</h1>
-        <p class="tagline">AI/ML Researcher | Software Developer | Educator</p>
-        <a href="#about" class="btn btn-primary mt-3">Learn More</a>
-    </header> -->
 
-    <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top">
-        <div class="container">
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <!-- Added wrapper div and spacing class -->
-            <div class="d-flex align-items-center">
-                <!-- <img src="assets/my-photo.png" alt="Shuvodip Biswas" class="profile-pic"> -->
-                <h1 class="ms-3 mb-0">Shuvodip Biswas</h1> <!-- ms-3 adds left margin -->
-            </div>
-            
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#skills">Skills</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#experience">Experience</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#projects">Projects</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
-                </ul>
-            </div>
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a class="nav-logo" href="#"><span>~/</span>shuvodip</a>
+    <ul class="nav-links">
+      <li><a href="#about">about</a></li>
+      <li><a href="#skills">skills</a></li>
+      <li><a href="#experience">experience</a></li>
+      <li><a href="#projects">research</a></li>
+      <li><a href="#contact">contact</a></li>
+    </ul>
+    <button class="hamburger" id="menuBtn" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="nav-mobile" id="mobileNav">
+    <a href="#about">about</a>
+    <a href="#skills">skills</a>
+    <a href="#experience">experience</a>
+    <a href="#projects">research</a>
+    <a href="#contact">contact</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div style="max-width:1100px;margin:0 auto;padding:0 2rem;">
+  <section class="hero" id="hero">
+    <div class="hero-grid">
+      <div class="hero-content fade-in">
+        <div class="hero-tag">Cybersecurity &amp; AI Research</div>
+        <h1 class="hero-name">Shuvodip<br/><span class="accent">Biswas</span></h1>
+        <p class="hero-title">MASc. Candidate · Concordia University</p>
+        <p class="hero-bio">Aspiring cybersecurity professional with academic training in computer science and information systems security. Completed a B.Sc. in Computer Science at North South University in 2024 and currently pursuing an MASc. at Concordia University. Brings hands-on experience in building web applications, mentoring students, and applying secure development practices to real-world problems.</p>
+        <div class="hero-cta">
+          <a href="#projects" class="btn-primary">View Research</a>
+          <a href="#contact" class="btn-ghost">Get in Touch</a>
         </div>
-    </nav>
-
-    <!-- About Section -->
-    <section id="about" class="py-5 bg-light">
-        <div class="container text-center">
-            <h2>About Me</h2>
-            <p class="tagline">AI/ML Researcher | Software Developer | Educator</p>
-            <p class="mt-3">I am a passionate AI/ML researcher with expertise in deep learning, data analysis, and explainable AI techniques. With a background in developing innovative solutions in healthcare diagnostics and an educational foundation from North South University, I strive to bridge the gap between academia and industry through impactful research and problem-solving.</p>
+      </div>
+      <div class="hero-visual fade-in" style="transition-delay:.2s">
+        <div class="terminal-card">
+          <div class="terminal-header">
+            <div class="dot red"></div>
+            <div class="dot yellow"></div>
+            <div class="dot green"></div>
+            <span class="terminal-title">profile.sh</span>
+          </div>
+          <div class="terminal-body">
+            <div><span class="t-prompt">$ </span><span class="t-cmd">whoami</span></div>
+            <div class="t-out">shuvodip_biswas</div>
+            <br/>
+            <div><span class="t-prompt">$ </span><span class="t-cmd">cat ./info.json</span></div>
+            <div><span class="t-key">"role"</span>: <span class="t-val">"Graduate Researcher"</span></div>
+            <div><span class="t-key">"institution"</span>: <span class="t-val">"Concordia University"</span></div>
+            <div><span class="t-key">"focus"</span>: <span class="t-val">"Cybersecurity + AI/ML"</span></div>
+            <div><span class="t-key">"papers"</span>: <span class="t-val">2</span></div>
+            <div><span class="t-key">"students_mentored"</span>: <span class="t-val">100+</span></div>
+            <br/>
+            <div><span class="t-prompt">$ </span><span class="t-cmd">ls ./skills/</span></div>
+            <div class="t-out">deep-learning/ explainableAI/</div>
+            <div class="t-out">secure-dev/ data-analysis/</div>
+            <br/>
+            <div><span class="t-prompt">$ </span><span class="t-cursor"></span></div>
+          </div>
         </div>
-    </section>
+      </div>
+    </div>
+  </section>
+</div>
 
-    <!-- Skills Section -->
-    <section id="skills" class="py-5">
-        <div class="container">
-            <h2 class="text-center">Skills</h2>
-            <div class="row mt-4">
-                <div class="col-md-4">
-                    <h4>Programming</h4>
-                    <p>Python, Java, SQL, C/C++, React, HTML/CSS</p>
-                </div>
-                <div class="col-md-4">
-                    <h4>Frameworks</h4>
-                    <p>TensorFlow, PyTorch, Keras</p>
-                </div>
-                <div class="col-md-4">
-                    <h4>Data Analysis Tools</h4>
-                    <p>Pandas, NumPy, Matplotlib, SciPy, Tableau</p>
-                </div>
-            </div>
+<!-- ABOUT -->
+<section id="about">
+  <div class="container">
+    <div class="section-label">01 // About</div>
+    <div class="section-title">Background &amp; <span>Overview</span></div>
+    <div class="about-grid fade-in">
+      <div class="about-text">
+        <p>I am an aspiring cybersecurity professional with a strong foundation in computer science and information systems security. I completed my B.Sc. in Computer Science at North South University in 2024, graduating with a research background in explainable AI and deep learning applied to healthcare.</p>
+        <p>I am currently pursuing an MASc. at Concordia University, where my research focuses on the intersection of cybersecurity and machine learning. I am interested in building trustworthy, interpretable AI systems and understanding how adversarial threats affect modern ML pipelines.</p>
+        <p>Beyond research, I enjoy mentoring students and translating complex technical concepts into accessible learning experiences—skills honed over two years as a Teaching Assistant at NSU.</p>
+      </div>
+      <div class="about-stats">
+        <div class="stat-card">
+          <div class="stat-num">2+</div>
+          <div class="stat-label">Research Papers</div>
         </div>
-    </section>
-
-    <!-- Experience Section -->
-    <section id="experience" class="py-5 bg-light">
-        <div class="container">
-            <h2 class="text-center">Experience</h2>
-            <div class="timeline">
-                <div class="timeline-item">
-                    <h4>Lab Instructor - North South University</h4>
-                    <p>July 2024 - Present</p>
-                    <p>- Designed and delivered lectures on Java programming and database management to undergraduate
-                        students.</p>
-                    <p>- Developed projects focusing on object-oriented programming, database design, and efficient
-                        algorithms</p>
-                    <p>- Mentored students on semester-long projects, resulting in successful completion and project
-                        presentation.</p>
-                </div>
-                 <div class="timeline-item">
-                    <h4>Web Developer - Green World Machinery</h4>
-                    <p>July 2024 - August 2025</p>
-                    <p>- Designed, developed, and maintained responsive websites and web applications.</p>
-                    <p>- Built reusable, scalable, and efficient code using HTML, CSS, JavaScript, and modern frameworks</p>
-                    <p>- Optimized websites for speed, scalability, and cross-browser compatibility.</p>
-                </div>
-                <div class="timeline-item">
-                    <h4>Teaching Assistant - North South University</h4>
-                    <p>June 2022 - June 2024</p>
-                    <p>- Guided over 100 students in understanding Statistics, improving their performance by an average
-                        of 15%.</p>
-                    <p>- Guided students on probability theory, statistical inference, and hypothesis testing.</p>
-                    <p>- Assisted in preparing course materials, grading assignments, and providing additional tutoring
-                        sessions for students</p>
-                </div>
-                <div class="timeline-item">
-                    <h4>Virtual Internship - eSRD Lab, BUET</h4>
-                    <p>June 2023 - October 2023</p>
-                    <p>- Acquired foundational data analysis skills, completing over 40 hours of intensive training.</p>
-                    <p>- Analyzed and interpreted E-commerce datasets, providing actionable insights that could improve
-                        sales by 10%.</p>
-                    <p>- Became proficient in multidimensional modeling techniques, data pre-processing, and
-                        frameworks.</p>
-                </div>
-            </div>
+        <div class="stat-card">
+          <div class="stat-num">100+</div>
+          <div class="stat-label">Students Mentored</div>
         </div>
-    </section>
-
-    <!-- Projects Section -->
-    <section id="projects" class="py-5">
-        <div class="container">
-            <h2 class="text-center">Publication and Research Projects</h2>
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="card">
-                        <img src="assets/resizedimage.png" alt="Brain MRI Analysis" class="card-img-top">
-                        <div class="card-body">
-                            <h5>How Explainable Are Black-Box Models in Brain Tumor Classification</h5>
-                            <p>- Developed deep learning models (VGG16, VGG19) for brain MRI analysis, focusing on
-                                interpretability using SHAP, LRP, GRAD-CAM, and LIME.
-                                <p> - Improved transparency and trust in AI-based diagnostic decisions through explainable AI
-                                techniques.
-                                </p>- Collaborated with healthcare professionals to address real-world challenges in medical
-                                diagnostics.
-                                <p></p><p>- Outcome: Accepted At the 27th IEEE International Conference on Computer and Information
-                                Technology (ICCIT), 2024.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card">
-                        <img src="assets/Screenshot 2025-01-06 203427.png" alt="Explainable AI" class="card-img-top">
-                        <div class="card-body">
-                            <h5>TabularClust: Enhancing Unsupervised Clustering with Contrastive Self-Supervised Learning and
-                                Attention-Driven Optimization</h5>
-                            <p>Developing a novel architecture designed to improve embedding quality and cluster tabular data effectively using self-supervised learning (SSL) techniques. The pipeline involves feature extraction, dimensionality reduction, and embedding enhancement through SSL frameworks, enabling more accurate and interpretable clustering outcomes. This project demonstrates expertise in representation learning, unsupervised methodologies, and advanced data analysis for applications in tabular datasets.</p>
-                            <p></p><p>- Outcome: Submitted at ACM TKDD 2025</p>
-                            
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card">
-                        <img src="assets/image.png" alt="Tabular Data Clustering" class="card-img-top">
-                        <div class="card-body">
-                            <h5>Multimodal-Image-DiseaseClassification-visualizationFilters_sparsing</h5>
-                            <p>The network processes preprocessed multimodal data through its convolutional layers to extract features, with the final layers responsible for classification. Filter visualization helps us understand what patterns the network has learned, while sparsing improves efficiency by pruning less meaningful connections</p>
-                            
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="stat-card">
+          <div class="stat-num">4+</div>
+          <div class="stat-label">Years Teaching</div>
         </div>
-    </section>
-
-    <!-- Contact Section -->
-    <section id="contact" class="py-5 bg-yellow text-dark">
-        <div class="container text-center">
-            <h2>Contact Me</h2>
-            <form action="https://formspree.io/f/xbllppop" method="POST" class="mt-4 mx-auto" style="max-width: 600px;">
-                <div class="mb-3">
-                    <input type="text" class="form-control" name="name" placeholder="Your Name" required>
-                </div>
-                <div class="mb-3">
-                    <input type="email" class="form-control" name="email" placeholder="Your Email" required>
-                </div>
-                <div class="mb-3">
-                    <textarea class="form-control" name="message" rows="5" placeholder="Your Message" required></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary">Send Message</button>
-            </form>
+        <div class="stat-card">
+          <div class="stat-num">3</div>
+          <div class="stat-label">Industry Roles</div>
         </div>
-    </section>
+      </div>
+    </div>
+  </div>
+</section>
 
-    <!-- Footer -->
-    <footer class="text-center py-4 bg-light">
-        <p>&copy; 2025 Shuvodip Biswas. All rights reserved.</p>
-        <p><a href="mailto:Shuvodip.biswas3@gmail.com">Shuvodip.biswas3@gmail.com</a></p>
-    </footer>
+<!-- SKILLS -->
+<section id="skills">
+  <div class="container">
+    <div class="section-label">02 // Skills</div>
+    <div class="section-title">Technical <span>Expertise</span></div>
+    <div class="skills-grid">
+      <div class="skill-card fade-in">
+        <div class="skill-icon">🔐</div>
+        <h4>Cybersecurity</h4>
+        <div class="skill-tags">
+          <span class="tag red">Secure Dev</span>
+          <span class="tag red">InfoSec</span>
+          <span class="tag red">Threat Modeling</span>
+          <span class="tag red">Cryptography</span>
+        </div>
+      </div>
+      <div class="skill-card fade-in" style="transition-delay:.05s">
+        <div class="skill-icon">🧠</div>
+        <h4>AI / Machine Learning</h4>
+        <div class="skill-tags">
+          <span class="tag">TensorFlow</span>
+          <span class="tag">PyTorch</span>
+          <span class="tag">Keras</span>
+          <span class="tag">Explainable AI</span>
+          <span class="tag">Deep Learning</span>
+        </div>
+      </div>
+      <div class="skill-card fade-in" style="transition-delay:.1s">
+        <div class="skill-icon">💻</div>
+        <h4>Programming</h4>
+        <div class="skill-tags">
+          <span class="tag blue">Python</span>
+          <span class="tag blue">Java</span>
+          <span class="tag blue">C/C++</span>
+          <span class="tag blue">SQL</span>
+          <span class="tag blue">React</span>
+          <span class="tag blue">HTML/CSS</span>
+        </div>
+      </div>
+      <div class="skill-card fade-in" style="transition-delay:.15s">
+        <div class="skill-icon">📊</div>
+        <h4>Data Analysis</h4>
+        <div class="skill-tags">
+          <span class="tag">Pandas</span>
+          <span class="tag">NumPy</span>
+          <span class="tag">SciPy</span>
+          <span class="tag">Matplotlib</span>
+          <span class="tag">Tableau</span>
+        </div>
+      </div>
+      <div class="skill-card fade-in" style="transition-delay:.2s">
+        <div class="skill-icon">🔬</div>
+        <h4>Research Methods</h4>
+        <div class="skill-tags">
+          <span class="tag">SHAP</span>
+          <span class="tag">GRAD-CAM</span>
+          <span class="tag">LRP</span>
+          <span class="tag">LIME</span>
+          <span class="tag">SSL</span>
+        </div>
+      </div>
+      <div class="skill-card fade-in" style="transition-delay:.25s">
+        <div class="skill-icon">🌐</div>
+        <h4>Web Development</h4>
+        <div class="skill-tags">
+          <span class="tag blue">Responsive Design</span>
+          <span class="tag blue">REST APIs</span>
+          <span class="tag blue">Cross-browser Compat.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="container">
+    <div class="section-label">03 // Experience</div>
+    <div class="section-title">Work &amp; <span>Academic History</span></div>
+    <div class="timeline">
+
+      <div class="tl-item fade-in">
+        <div class="tl-meta">
+          <span class="tl-date">2025 – Present</span>
+          <span class="tl-badge blue">Current</span>
+        </div>
+        <div class="tl-title">Graduate Research Assistant</div>
+        <div class="tl-org">Concordia University — Montréal, QC</div>
+        <ul class="tl-points">
+          <li>Conducting research at the intersection of cybersecurity and machine learning under faculty supervision.</li>
+          <li>Investigating adversarial robustness, secure ML pipelines, and trustworthy AI systems.</li>
+          <li>Contributing to lab publications and presenting findings in seminars and group meetings.</li>
+          <li>Collaborating with cross-disciplinary team members on grant-funded research projects.</li>
+        </ul>
+      </div>
+
+      <div class="tl-item fade-in">
+        <div class="tl-meta">
+          <span class="tl-date">July 2024 – December 2025</span>
+          <span class="tl-badge">Academic</span>
+        </div>
+        <div class="tl-title">Lab Instructor</div>
+        <div class="tl-org">North South University — Dhaka, Bangladesh</div>
+        <ul class="tl-points">
+          <li>Designed and delivered lectures on Java programming and database management to undergraduate students.</li>
+          <li>Developed projects focusing on OOP, database design, and efficient algorithms.</li>
+          <li>Mentored students on semester-long projects, resulting in successful completion and presentations.</li>
+        </ul>
+      </div>
+
+      <div class="tl-item fade-in">
+        <div class="tl-meta">
+          <span class="tl-date">July 2024 – August 2025</span>
+          <span class="tl-badge blue">Industry</span>
+        </div>
+        <div class="tl-title">Web Developer</div>
+        <div class="tl-org">Green World Machinery</div>
+        <ul class="tl-points">
+          <li>Designed, developed, and maintained responsive websites and web applications.</li>
+          <li>Built reusable, scalable, and efficient code using HTML, CSS, JavaScript, and modern frameworks.</li>
+          <li>Optimized websites for speed, scalability, and cross-browser compatibility.</li>
+        </ul>
+      </div>
+
+      <div class="tl-item fade-in">
+        <div class="tl-meta">
+          <span class="tl-date">June 2022 – June 2024</span>
+          <span class="tl-badge">Academic</span>
+        </div>
+        <div class="tl-title">Teaching Assistant</div>
+        <div class="tl-org">North South University — Dhaka, Bangladesh</div>
+        <ul class="tl-points">
+          <li>Guided 100+ students in Statistics, improving average performance by 15%.</li>
+          <li>Covered probability theory, statistical inference, and hypothesis testing.</li>
+          <li>Assisted in preparing course materials, grading, and additional tutoring sessions.</li>
+        </ul>
+      </div>
+
+      <div class="tl-item fade-in">
+        <div class="tl-meta">
+          <span class="tl-date">June 2023 – October 2023</span>
+          <span class="tl-badge blue">Internship</span>
+        </div>
+        <div class="tl-title">Virtual Intern — Data Analysis</div>
+        <div class="tl-org">eSRD Lab, BUET</div>
+        <ul class="tl-points">
+          <li>Completed 40+ hours of intensive data analysis training.</li>
+          <li>Analyzed e-commerce datasets, providing insights with potential 10% sales improvement.</li>
+          <li>Gained proficiency in multidimensional modeling, data pre-processing, and analysis frameworks.</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- RESEARCH / PROJECTS -->
+<section id="projects">
+  <div class="container">
+    <div class="section-label">04 // Research</div>
+    <div class="section-title">Publications &amp; <span>Projects</span></div>
+    <div class="projects-grid">
+
+      <div class="project-card fade-in">
+        <div class="project-card-header">
+          <span class="project-type">Conference Paper</span>
+          <span class="project-status status-published">Published</span>
+        </div>
+        <div class="project-card-body">
+          <h5>How Explainable Are Black-Box Models in Brain Tumor Classification?</h5>
+          <p>Developed deep learning models (VGG16, VGG19) for brain MRI analysis, focusing on interpretability using SHAP, LRP, GRAD-CAM, and LIME. Improved transparency and trust in AI-based diagnostic decisions through explainable AI techniques. Collaborated with healthcare professionals to address real-world challenges in medical diagnostics.</p>
+          <div class="project-venue">📍 IEEE ICCIT 2024 — 27th International Conference on Computer &amp; Information Technology</div>
+        </div>
+      </div>
+
+      <div class="project-card fade-in" style="transition-delay:.1s">
+        <div class="project-card-header">
+          <span class="project-type">Journal Article</span>
+          <span class="project-status status-submitted">Under Review</span>
+        </div>
+        <div class="project-card-body">
+          <h5>TabularClust: Enhancing Unsupervised Clustering with Contrastive Self-Supervised Learning and Attention-Driven Optimization</h5>
+          <p>Novel architecture designed to improve embedding quality and cluster tabular data effectively using self-supervised learning (SSL). The pipeline involves feature extraction, dimensionality reduction, and embedding enhancement via SSL frameworks, enabling more accurate and interpretable clustering outcomes.</p>
+          <div class="project-venue">📍 Submitted — IJCNN 2026</div>
+        </div>
+      </div>
+
+      <div class="project-card fade-in" style="transition-delay:.2s">
+        <div class="project-card-header">
+          <span class="project-type">Project</span>
+          <span class="project-status status-ongoing">Completed</span>
+        </div>
+        <div class="project-card-body">
+          <h5>Multimodal Image Disease Classification with Filter Visualization &amp; Sparsing</h5>
+          <p>Processes preprocessed multimodal data through convolutional layers for feature extraction, with final layers handling classification. Filter visualization reveals what patterns the network has learned, while sparsing improves efficiency by pruning less meaningful connections.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="container">
+    <div class="section-label">05 // Contact</div>
+    <div class="section-title">Get In <span>Touch</span></div>
+    <div class="contact-grid fade-in">
+      <div class="contact-info">
+        <p>Whether you have a research collaboration in mind, a question about my work, or just want to connect, feel free to reach out.</p>
+        <div class="contact-links">
+          <a href="mailto:dipb8738@gmail.com" class="contact-link">
+            <div class="contact-link-icon">✉</div>
+            dipb8738@gmail.com
+          </a>
+          <a href="mailto:shuvodip.biswas@mail.concordia.ca" class="contact-link">
+            <div class="contact-link-icon">🎓</div>
+            Concordia University
+          </a>
+          <a href="https://www.linkedin.com/in/shuvodip-biswas/" class="contact-link">
+            <div class="contact-link-icon">💼</div>
+            LinkedIn
+          </a>
+          <a href="https://github.com/Dip-Biswas" class="contact-link">
+            <div class="contact-link-icon">🐙</div>
+            GitHub
+          </a>
+        </div>
+      </div>
+      <form class="contact-form" action="https://formspree.io/f/xbllppop" method="POST">
+        <div class="form-row">
+          <div class="form-field">
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" placeholder="Your name" required />
+          </div>
+          <div class="form-field">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="your@email.com" required />
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="message">Message</label>
+          <textarea id="message" name="message" placeholder="Your message..." required></textarea>
+        </div>
+        <button type="submit" class="btn-primary" style="align-self:flex-start">Send Message</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>&copy; 2025 Shuvodip Biswas &nbsp;·&nbsp; <a href="mailto:shuvodip.biswas3@gmail.com">shuvodip.biswas3@gmail.com</a></p>
+</footer>
+
+<script>
+  // Mobile nav toggle
+  const btn = document.getElementById('menuBtn');
+  const nav = document.getElementById('mobileNav');
+  btn.addEventListener('click', () => nav.classList.toggle('open'));
+  nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => nav.classList.remove('open')));
+
+  // Fade-in on scroll
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+</script>
 </body>
-
 </html>

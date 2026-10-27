@@ -1,6 +1,6 @@
 # Shuvodip Biswas — Research & life off-screen
 
-A personal portfolio built around Shuvodip's security research, Dhaka-to-Montréal path, own photograph, running, workouts, and movies.
+A personal portfolio built around Shuvodip's security research, education and experience, own photograph, running, workouts, and movies.
 
 The static page has no build dependencies. Keep `index.html`, `Shuvodip_Biswas_CV_Classic.pdf`, and `shuvodip-portrait.jpg` together. Save CV downloads the original supplied PDF. The photo is the user's supplied image, unchanged.
 
@@ -17,3 +17,5 @@ The trust-boundary experiment is a deterministic educational illustration of pro
 GitHub Pages serves the repository root on `main`; `.nojekyll` enables direct static hosting. The Sites copy serves `dist/` according to `.openai/hosting.json`. Concordia serves the same three static assets.
 
 For a local preview, run `python -m http.server 4173 --bind 127.0.0.1` from the folder containing the HTML. In the Sites source, add `--directory dist`.
+
+Current research: evaluating the reliability of model lineage and provenance detectors. Research supervisors: Dr. Mohammad Mannan and Dr. Amr Youssef. These details were corrected directly by Shuvodip.

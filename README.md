@@ -19,3 +19,7 @@ GitHub Pages serves the repository root on `main`; `.nojekyll` enables direct st
 For a local preview, run `python -m http.server 4173 --bind 127.0.0.1` from the folder containing the HTML. In the Sites source, add `--directory dist`.
 
 Current research: evaluating the reliability of model lineage and provenance detectors. Research supervisors: Dr. Mohammad Mannan and Dr. Amr Youssef. These details were corrected directly by Shuvodip.
+
+## Headball
+
+`headball.html` adds a 90-second, first-to-five football game against a clearly labelled computer-controlled Shuvodip. Keep `headball.css`, `headball.js`, and `headball-engine.js` alongside it. Keyboard and touch controls, two difficulty levels, optional sound, pause/resume, and rematches work entirely in the browser. No live multiplayer, accounts, or external game services. The portfolio links to the game from its navigation and Off the clock section.

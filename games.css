@@ -34,3 +34,5 @@ h1,h2,p { margin: 0; }
   .player-nav h1 { order: 1; flex-basis: 100%; }
   #player { margin-inline: -10px; }
 }
+
+@media (min-width: 950px) { .games { grid-template-columns: repeat(3,minmax(0,1fr)); } }

@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#203b33"><title>Chess with Shuvodip</title>
+<meta name="description" content="Play a game of chess as White against computer-controlled Shuvodip.">
+<link rel="stylesheet" href="chess.css"><script type="module" src="chess-game.js"></script>
+</head><body>
+<header><a class="brand" href="index.html" aria-label="Portfolio home">sb.</a><a href="play-games-with-me.html">← Play Games With Me</a></header>
+<main>
+<div class="heading"><h1>Chess <em>with Shuvodip.</em></h1><p>You play White. Tap or click a piece, then its destination.</p></div>
+<div class="layout">
+<section class="table" aria-label="Chessboard">
+  <div class="player"><span class="stone dark"></span><b>Shuvodip</b><small>Computer · Black</small></div>
+  <div id="board" class="board" role="group" aria-label="Chess board. Arrow keys move between squares. Enter selects."></div>
+  <div class="player"><span class="stone light"></span><b>You</b><small>White</small></div>
+</section>
+<aside><p id="status" role="status">Setting up the board…</p>
+<div id="promotion" hidden><h2>Promote your pawn</h2><div id="promotions"></div><button id="cancel" type="button">Cancel</button></div>
+<h2>Move sheet</h2><div id="sheet" aria-label="Move history"></div>
+<div class="actions"><button type="button" id="undo" disabled>Take back</button><button type="button" id="reset">New game</button></div>
+</aside>
+</div></main></body></html>

@@ -1,6 +1,7 @@
 // The tabletop uses a fixed coordinate system on desktop and mobile.
 export const DESK = { width: 840, height: 450, edge: 32 };
 export const STEP = 1 / 120;
+export const FALL_TIME = 0.52;
 export const PENS = [
   { name: 'Ballpoint', detail: 'Light and quick to accelerate.', mass: 0.85, friction: 300, length: 102, radius: 8, ink: '#bd5738' },
   { name: 'Gel pen', detail: 'Balanced weight and a grippy barrel.', mass: 1.05, friction: 390, length: 108, radius: 10, ink: '#31668b' },
@@ -8,9 +9,11 @@ export const PENS = [
   { name: 'Fineliner', detail: 'Long, slim, and easy to spin.', mass: 0.93, friction: 250, length: 130, radius: 7, ink: '#875677' }
 ];
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+const ROLL_FRACTION = [0.58, 0.22, 0.49, 0.33];
 export function place(type, x, y, angle) {
   const spec = PENS[type];
   return { type, x, y, angle, vx: 0, vy: 0, spin: 0, fallen: false,
+    roll: 0, rock: 0, rockSpeed: 0, fallTime: 0, dropX: 0, dropY: 0,
     inertia: spec.mass * (spec.length ** 2 + 4 * spec.radius ** 2) / 12 };
 }
 export function setup(playerType, cpuType, round = 0) {
@@ -33,10 +36,18 @@ export function flick(pen, radians, power, contact = pen) {
   pen.spin = mass * lever * speed / pen.inertia;
 }
 function advance(pen, dt) {
-  if (pen.fallen) return;
+  if (pen.fallen) {
+    pen.fallTime = Math.min(FALL_TIME, pen.fallTime + dt);
+    return;
+  }
   const speed = Math.hypot(pen.vx, pen.vy);
   const spec = PENS[pen.type];
-  const remaining = Math.max(0, speed - spec.friction * dt);
+  const crossSpeed = pen.vy * Math.cos(pen.angle) - pen.vx * Math.sin(pen.angle);
+  // The barrel rolls most freely sideways. The rubber gel grip skids more.
+  const rollFraction = ROLL_FRACTION[pen.type];
+  pen.roll += crossSpeed * rollFraction / spec.radius * dt;
+  const crossShare = speed ? Math.abs(crossSpeed) / speed : 0;
+  const remaining = Math.max(0, speed - spec.friction * (1 - 0.32 * crossShare * rollFraction) * dt);
   const ratio = speed ? remaining / speed : 0;
   pen.vx *= ratio;
   pen.vy *= ratio;
@@ -44,6 +55,8 @@ function advance(pen, dt) {
   pen.x += pen.vx * dt;
   pen.y += pen.vy * dt;
   pen.angle += pen.spin * dt;
+  pen.rockSpeed += (-240 * pen.rock - 18 * pen.rockSpeed) * dt;
+  pen.rock += pen.rockSpeed * dt;
 }
 // Find the closest contact between the rounded barrels by projecting their ends.
 function ends(pen) {
@@ -92,6 +105,10 @@ function collide(a, b) {
   b.vx += impulse * invB * normalX;
   b.vy += impulse * invB * normalY;
   b.spin += impulse * torqueB / b.inertia;
+  // A hit lifts one side of each barrel before it settles against the wood.
+  const kick = Math.min(5, impulse * 0.014);
+  a.rockSpeed -= kick;
+  b.rockSpeed += kick;
 }
 export function edgeDistance(pen) {
   return Math.min(pen.x, DESK.width - pen.x, pen.y, DESK.height - pen.y) - DESK.edge;
@@ -100,9 +117,16 @@ export function step(pens, dt = STEP) {
   pens.forEach(p => advance(p, dt));
   if (pens.every(p => !p.fallen)) collide(pens[0], pens[1]);
   for (const p of pens) {
-    if (edgeDistance(p) < 0) p.fallen = true;
+    if (!p.fallen && edgeDistance(p) < 0) {
+      p.fallen = true;
+      const sides = [p.x, DESK.width - p.x, p.y, DESK.height - p.y];
+      const side = sides.indexOf(Math.min(...sides));
+      p.dropX = [-1, 1, 0, 0][side];
+      p.dropY = [0, 0, -1, 1][side];
+    }
   }
-  return pens.every(p => p.fallen || (!p.vx && !p.vy && !p.spin));
+  return pens.every(p => p.fallen ? p.fallTime >= FALL_TIME :
+    !p.vx && !p.vy && !p.spin && Math.abs(p.rock) < 0.004 && Math.abs(p.rockSpeed) < 0.05);
 }
 export function outcome(pens) {
   if (pens.every(p => p.fallen)) return 'tie';

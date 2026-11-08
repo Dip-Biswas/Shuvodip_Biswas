@@ -1,4 +1,5 @@
-import { DESK, STEP, PENS, place, setup, gripAt, flick, step, outcome, chooseShot } from './penfight-engine.js?v=grip1';
+import { makeTable, drawPen, drawDrop } from './penfight-render.js?v=motion2';
+import { DESK, STEP, PENS, place, setup, gripAt, flick, step, outcome, chooseShot } from './penfight-engine.js?v=motion2';
 
 const byId = id => document.getElementById(id);
 const desk = byId('desk');
@@ -13,134 +14,109 @@ const state = {
   round: 0, shooter: 0, wait: 0, drag: null
 };
 
-function drawPen(ctx, pen) {
-  const spec = PENS[pen.type];
-  const half = spec.length / 2, radius = spec.radius;
-  ctx.save();
-  ctx.translate(pen.x, pen.y);
-  ctx.rotate(pen.angle);
-  ctx.shadowOffsetY = 3;
-  ctx.shadowBlur = 3;
-  ctx.shadowColor = '#452b1f65';
-  ctx.fillStyle = spec.ink;
-  ctx.beginPath();
-  ctx.roundRect(-half, -radius, spec.length - 12, radius * 2, radius);
-  ctx.fill();
-  ctx.shadowColor = 'transparent';
-  const highlight = ctx.createLinearGradient(0, -radius, 0, radius);
-  highlight.addColorStop(0, '#ffffff0a');
-  highlight.addColorStop(0.25, '#ffffff70');
-  highlight.addColorStop(0.55, '#ffffff00');
-  highlight.addColorStop(1, '#121c2640');
-  ctx.fillStyle = highlight;
-  ctx.fill();
-  const brass = pen.type === 2;
-  ctx.fillStyle = brass ? '#d8ad61' : '#d6d9d3';
-  ctx.beginPath();
-  ctx.moveTo(half - 17, -radius * .72);
-  ctx.lineTo(half, 0);
-  ctx.lineTo(half - 17, radius * .72);
-  ctx.closePath();
-  ctx.fill();
-  ctx.fillStyle = '#222c29';
-  ctx.fillRect(half - 2, -1, 3, 2);
-  if (brass) {
-    ctx.fillRect(half - 12, -.7, 10, 1.4);
-    ctx.fillStyle = '#d2ac69';
-    ctx.fillRect(-half + 34, -radius, 3, radius * 2);
-  } else if (pen.type === 1) {
-    ctx.fillStyle = '#183144';
-    for (let i = 0; i < 5; i++) ctx.fillRect(half - 37 + i * 4, -radius + 1, 2, radius * 2 - 2);
-  } else if (pen.type === 3) {
-    ctx.fillStyle = '#33283f';
-    ctx.fillRect(-half + 4, -radius, 27, 2 * radius);
+const background = makeTable();
+const edge = DESK.edge;
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+let previous = null, release = null, cpuShot = null, elapsed = 0;
+let last = 0, accumulator = 0;
+const camera = { zoom: 1, x: 0, y: 0 };
+
+function trackShot(delta) {
+  if (state.drag) return false;
+  const [a,b] = state.pens;
+  let zoom = 1, x = 0, y = 0;
+  if (state.phase === 'moving' && !reduceMotion.matches) {
+    // Keep both barrels and the desk edge in frame, even on a narrow screen.
+    zoom = Math.max(1,Math.min(1.28, DESK.width/(Math.abs(a.x-b.x)+190),
+      DESK.height/(Math.abs(a.y-b.y)+160)));
+    const focusX = (a.x+b.x)/2, focusY = (a.y+b.y)/2;
+    x = Math.max(DESK.width*(1-zoom),Math.min(0,DESK.width/2-focusX*zoom));
+    y = Math.max(DESK.height*(1-zoom),Math.min(0,DESK.height/2-focusY*zoom));
   }
-  ctx.fillStyle = brass ? '#e7c789' : '#d9ded6';
-  ctx.beginPath();
-  ctx.roundRect(-half + 6, -radius + 2, brass ? 30 : 23, 3, 1.5);
-  ctx.fill();
-  // Small material details remain visible when the pens turn or slide.
-  if (pen.type === 0) {
-    ctx.fillStyle = '#f4dfc9'; ctx.fillRect(-half+13, -3.8, 48, 7.6);
-    ctx.fillStyle = '#40251c'; ctx.fillRect(-half+13, -1.7, 46, 2.8);
-    ctx.fillStyle = '#ffffffaa'; ctx.fillRect(-half+15, -3.6, 43, 1);
-  } else if (pen.type === 2) {
-    ctx.fillStyle = '#644a24'; ctx.beginPath(); ctx.arc(half-9,0,1.5,0,2*Math.PI); ctx.fill();
-    ctx.fillStyle = '#ffdf93'; ctx.fillRect(-half+39,-radius+.5,1.1,2*radius-1);
-  } else if (pen.type === 3) {
-    ctx.fillStyle = '#ddd7c9'; ctx.fillRect(half-13,-2.5,9,5);
-    ctx.fillStyle = '#312a30'; ctx.fillRect(half-5,-1.3,5,2.6);
-  }
-  ctx.restore();
+  const easing = reduceMotion.matches ? 1 : 1-Math.exp(-delta*8);
+  const changed = Math.abs(camera.zoom-zoom)>.0001 || Math.abs(camera.x-x)>.02 || Math.abs(camera.y-y)>.02;
+  camera.zoom += (zoom-camera.zoom)*easing;
+  camera.x += (x-camera.x)*easing;
+  camera.y += (y-camera.y)*easing;
+  return changed;
 }
 
-// Paint the stationary desktop once. All motion uses the same logical coordinates.
-const background = document.createElement('canvas');
-background.width = DESK.width;
-background.height = DESK.height;
-const wood = background.getContext('2d');
-wood.fillStyle = '#294439';
-wood.fillRect(0, 0, DESK.width, DESK.height);
-const edge = DESK.edge;
-const surfaceWidth = DESK.width - edge * 2, surfaceHeight = DESK.height - edge * 2;
-wood.fillStyle = '#172c23';
-wood.fillRect(edge + 5, edge + 8, surfaceWidth, surfaceHeight);
-const grain = wood.createLinearGradient(0, edge, DESK.width, DESK.height);
-grain.addColorStop(0, '#eed7a9');
-grain.addColorStop(.56, '#e7c795');
-grain.addColorStop(1, '#d1aa78');
-wood.fillStyle = grain;
-wood.fillRect(edge, edge, surfaceWidth, surfaceHeight);
-wood.save();
-wood.beginPath();
-wood.rect(edge, edge, surfaceWidth, surfaceHeight);
-wood.clip();
-// A cut through a knot bends neighbouring growth lines together. Fine pores
-// and small breaks interrupt the grain instead of repeating a tiled image.
-let seed = 1741;
-function noise() { seed = (Math.imul(seed,1664525) + 1013904223) >>> 0; return seed / 4294967296; }
-for (let y = edge - 14; y < DESK.height; y += .8 + noise()*2.5) {
-  wood.beginPath();
-  wood.strokeStyle = noise() > .6 ? 'rgba(255,242,203,.28)' : 'rgba(103,62,31,.14)';
-  wood.lineWidth = .3 + noise()*1.1;
-  for (let x=edge; x<=DESK.width-edge+8; x+=8) {
-    const bend = (cx,cy) => 19*Math.exp(-((x-cx)**2)/7000)*Math.tanh((y-cy)/9)*Math.exp(-Math.abs(y-cy)/34);
-    const h = y + 3*Math.sin(x/138+y/62)+bend(180,118)+bend(618,312);
-    if(x===edge) wood.moveTo(x,h); else wood.lineTo(x,h);
+function pullOffset(radians, strength) {
+  const distance = reduceMotion.matches ? 0 : 7 * strength;
+  return { x: -Math.cos(radians)*distance, y: -Math.sin(radians)*distance };
+}
+function visualPose(index, blend) {
+  const pen = state.pens[index];
+  const pose = {...pen};
+  if (previous && state.phase === 'moving') {
+    const lastPose = previous[index];
+    for (const key of ['x','y','angle','roll','rock','fallTime']) {
+      pose[key] = lastPose[key] + (pen[key]-lastPose[key])*blend;
+    }
   }
-  wood.stroke();
+  let offset = null;
+  if (index === state.shooter) {
+    if (state.drag) offset = pullOffset(angle*Math.PI/180, power/100);
+    if (state.phase === 'think' && cpuShot) {
+      const progress = Math.min(1, Math.max(0, 1-state.wait/.6));
+      offset = pullOffset(cpuShot.radians, cpuShot.power*progress*progress);
+    }
+    if (state.phase === 'moving' && release) {
+      const remaining = Math.max(0, 1-elapsed/.075)**2;
+      offset = {x:release.x*remaining, y:release.y*remaining};
+    }
+  }
+  if (offset) { pose.x += offset.x; pose.y += offset.y; }
+  return pose;
 }
-for (let i=0;i<2500;i++) {
-  wood.fillStyle = noise()>.45 ? '#693f241c' : '#fff7e228';
-  wood.fillRect(edge+noise()*surfaceWidth,edge+noise()*surfaceHeight,1+noise()*4,.5);
-}
-wood.restore();
-wood.strokeStyle = '#88623b';
-wood.lineWidth = 2;
-wood.strokeRect(edge, edge, surfaceWidth, surfaceHeight);
-wood.strokeStyle = '#ffedcc99';
-wood.strokeRect(edge + 3, edge + 3, surfaceWidth - 6, surfaceHeight - 6);
-function drawField() {
-  context.drawImage(background, 0, 0);
-  state.pens.forEach((p, i) => {
-    if (p.fallen) return;
-    drawPen(context, p);
-    const labelX = Math.max(64, Math.min(DESK.width - 64, p.x));
-    const labelY = Math.max(edge + 12, Math.min(DESK.height - edge + 14, p.y + 47));
-    context.font = 'bold 13px Arial';
+
+function drawField(blend = 1) {
+  context.save();
+  context.translate(camera.x,camera.y);
+  context.scale(camera.zoom,camera.zoom);
+  context.drawImage(background,0,0,DESK.width,DESK.height);
+  state.pens.forEach((pen,index) => {
+    const pose = visualPose(index,blend);
+    if (pen.fallen) { drawDrop(context,pose); return; }
+    if (state.phase === 'moving' && !reduceMotion.matches && Math.hypot(pen.vx,pen.vy)>240) {
+      context.save();
+      context.globalAlpha=.115;
+      drawPen(context,{...pose,x:pose.x-pen.vx*.007,y:pose.y-pen.vy*.007,angle:pose.angle-pen.spin*.007},false);
+      context.restore();
+    }
+    drawPen(context,pose);
+    if (state.phase !== 'setup' && state.phase !== 'aim') return;
+    const labelX = Math.max(62,Math.min(DESK.width-62,pose.x));
+    const labelY = Math.max(edge+12,Math.min(DESK.height-edge-4,pose.y+47));
+    context.font = 'bold 12px Arial';
     context.textAlign = 'center';
-    context.fillStyle = '#fff8e9ed';
-    context.fillRect(labelX - 30, labelY - 12, 60, 18);
-    context.fillStyle = '#203b33';
-    context.fillText(i === 0 ? 'YOU' : 'CPU', labelX, labelY + 1);
+    context.lineWidth = 3;
+    context.strokeStyle = '#edd1a6';
+    context.fillStyle = '#352f23';
+    const name = index === 0 ? 'YOU' : 'CPU';
+    context.strokeText(name,labelX,labelY);
+    context.fillText(name,labelX,labelY);
   });
   if (state.phase === 'aim') drawGuide();
+  context.restore();
+}
+
+function resizeDesk() {
+  const scale = Math.min(2.5,window.devicePixelRatio || 1) * desk.getBoundingClientRect().width / DESK.width;
+  const width = Math.max(1, Math.round(DESK.width*scale));
+  const height = Math.max(1, Math.round(DESK.height*scale));
+  if (desk.width !== width || desk.height !== height) {
+    desk.width=width; desk.height=height;
+  }
+  context.setTransform(width/DESK.width,0,0,height/DESK.height,0,0);
+  drawField();
 }
 function drawGuide() {
   const pen = state.pens[0];
   const grip = state.drag?.contact || pen;
   context.save();
-  context.translate(grip.x, grip.y);
+  const offset = state.drag ? pullOffset(angle*Math.PI/180,power/100) : {x:0,y:0};
+  context.translate(grip.x+offset.x, grip.y+offset.y);
   context.strokeStyle = '#fff9e7';
   context.lineWidth = 2;
   context.beginPath(); context.arc(0, 0, state.drag ? 6 : 4, 0, Math.PI*2); context.stroke();
@@ -205,6 +181,10 @@ function setPhase(phase, title, message) {
   drawField();
 }
 function prepare() {
+  cpuShot = previous = release = null;
+  camera.zoom = 1;
+  camera.x = camera.y = 0;
+  accumulator = 0;
   state.opponent = (state.selected + 2) % PENS.length;
   state.scores = [0, 0];
   state.round = 0;
@@ -232,6 +212,7 @@ function setAim(degrees, amount) {
 function startTurn(side) {
   state.shooter = side;
   if (side === 1) {
+    cpuShot = chooseShot(state.pens);
     state.wait = .8;
     setPhase('think', 'Shuvodip’s turn', 'Shuvodip is lining up a shot.');
     return;
@@ -245,6 +226,9 @@ function startRound() {
   startTurn(state.round % 2);
 }
 function launch(radians, power, contact) {
+  elapsed = accumulator = 0;
+  release = pullOffset(radians, power);
+  previous = state.pens.map(pen => ({...pen}));
   flick(state.pens[state.shooter], radians, power, contact);
   setPhase('moving', state.shooter ? 'Shuvodip flicked' : 'You flicked', 'Waiting for the pens to settle.');
 }
@@ -273,10 +257,11 @@ startButton.addEventListener('click', () => {
 });
 shotButton.addEventListener('click', takeShot);
 function point(e, box) {
-  return { x: (e.clientX-box.left)*DESK.width/box.width, y: (e.clientY-box.top)*DESK.height/box.height };
+  return { x: ((e.clientX-box.left)*DESK.width/box.width-camera.x)/camera.zoom,
+    y: ((e.clientY-box.top)*DESK.height/box.height-camera.y)/camera.zoom };
 }
 function hit(e) {
-  const box = desk.getBoundingClientRect(), scale = DESK.width / box.width;
+  const box = desk.getBoundingClientRect(), scale = DESK.width / box.width / camera.zoom;
   const pen = state.pens[0];
   const pad = e.pointerType === 'touch' ? Math.max(4, 22*scale-PENS[pen.type].radius) : 4*scale;
   return gripAt(pen, point(e,box), pad);
@@ -340,26 +325,28 @@ desk.addEventListener('keydown', e => {
   const sign = e.key==='ArrowLeft' ? -5 : e.key==='ArrowRight' ? 5 : 0;
   setAim(((angle+sign+540)%360)-180, Math.max(5, power+(e.key==='ArrowUp'?5:e.key==='ArrowDown'?-5:0)));
 });
-let last = 0, accumulator = 0;
 function frame(now) {
   const delta = last ? Math.min(.08, (now - last) / 1000) : 0;
   last = now;
+  const cameraMoved = trackShot(delta);
   if (state.phase === 'think') {
     state.wait -= delta;
-    if (state.wait <= 0) {
-      const shot = chooseShot(state.pens);
-      launch(shot.radians, shot.power);
-    }
+    if (state.wait <= 0) launch(cpuShot.radians, cpuShot.power);
+    else drawField();
   }
   if (state.phase === 'moving') {
+    elapsed += delta;
     accumulator += delta;
     while (accumulator >= STEP && state.phase === 'moving') {
       accumulator -= STEP;
+      previous = state.pens.map(pen => ({...pen}));
       if (step(state.pens)) { accumulator = 0; finishTurn(); }
     }
-    drawField();
-  }
+    drawField(accumulator/STEP);
+  } else if (cameraMoved) drawField();
   requestAnimationFrame(frame);
 }
 prepare();
+resizeDesk();
+new ResizeObserver(resizeDesk).observe(desk);
 requestAnimationFrame(frame);

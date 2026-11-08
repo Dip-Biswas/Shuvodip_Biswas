@@ -17,19 +17,30 @@ export function setup(playerType, cpuType, round = 0) {
   const offset = [-16, 26, -36, 12][round % 4];
   return [place(playerType, 285, 225 + offset, -0.85), place(cpuType, 555, 225 - offset, 1.05)];
 }
-export function flick(pen, radians, power) {
-  const speed = (92 + clamp(power, 0, 1) * 600) / Math.sqrt(PENS[pen.type].mass);
+// Snap a real grip to the barrel. Padding is input tolerance, not a longer lever.
+export function gripAt(pen, point, padding = 0) {
+  const contact = project(point, ends(pen));
+  if (Math.hypot(point.x - contact.x, point.y - contact.y) > PENS[pen.type].radius + padding) return null;
+  return contact;
+}
+export function flick(pen, radians, power, contact = pen) {
+  const mass = PENS[pen.type].mass;
+  const lever = (contact.x - pen.x) * Math.sin(radians) - (contact.y - pen.y) * Math.cos(radians);
+  // Share the flick's energy between translation and rotation at the contact point.
+  const speed = 700 * clamp(power, 0, 1) / Math.sqrt(mass * (1 + mass * lever ** 2 / pen.inertia));
   pen.vx = Math.cos(radians) * speed;
   pen.vy = Math.sin(radians) * speed;
+  pen.spin = mass * lever * speed / pen.inertia;
 }
 function advance(pen, dt) {
   if (pen.fallen) return;
   const speed = Math.hypot(pen.vx, pen.vy);
-  const remaining = Math.max(0, speed - PENS[pen.type].friction * dt);
+  const spec = PENS[pen.type];
+  const remaining = Math.max(0, speed - spec.friction * dt);
   const ratio = speed ? remaining / speed : 0;
   pen.vx *= ratio;
   pen.vy *= ratio;
-  pen.spin = Math.sign(pen.spin) * Math.max(0, Math.abs(pen.spin) - 8 * dt);
+  pen.spin = Math.sign(pen.spin) * Math.max(0, Math.abs(pen.spin) - 3 * spec.friction / spec.length * dt);
   pen.x += pen.vx * dt;
   pen.y += pen.vy * dt;
   pen.angle += pen.spin * dt;

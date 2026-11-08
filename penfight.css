@@ -51,12 +51,16 @@ a:focus-visible, button:focus-visible, input:focus-visible, #desk:focus-visible 
 .status { background: var(--ink); color: var(--paper); padding: 10px 16px; display: flex; align-items: baseline; gap: 14px; min-height: 42px; }
 .status b { color: var(--peach); white-space: nowrap; font: bold 12px/1.6 'Courier New', monospace; }
 .status p { font-size: 12px; }
-#desk { display: block; width: 100%; height: auto; background: #284139; touch-action: none; user-select: none; }
-#desk.aimable { cursor: crosshair; }
-.controls { padding: 14px 18px; display: grid; grid-template-columns: 1fr 1fr auto; gap: 20px; align-items: center; }
-.controls label { font-size: 11px; font-weight: bold; }
-output { float: right; font: 10px 'Courier New', monospace; font-weight: normal; }
-input[type=range] { display: block; width: 100%; margin: 5px 0 0; accent-color: var(--ink); }
+#desk { display: block; width: 100%; height: auto; background: #284139; touch-action: pan-y; user-select: none; }
+#desk.aimable { touch-action: none; }
+#desk.can-grip { cursor: grab; }
+#desk.gripped { cursor: grabbing; }
+.controls { padding: 14px 18px; display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; justify-content: space-between; }
+.controls b, .force span { font: bold 11px/1.4 'Courier New', monospace; }
+.controls p { color: var(--muted); font-size: 12px; }
+.force { width: clamp(88px, 16%, 120px); }
+.force output { float: right; }
+.force meter { display: block; width: 100%; height: 9px; accent-color: var(--ink); }
 .rules { margin-top: 29px; padding-top: 17px; border-top: 1px solid var(--rule); display: grid; grid-template-columns: .7fr 1fr 1fr 1fr; gap: 23px; }
 .rules p { font-size: 12px; color: var(--muted); }
 .rules b { color: var(--ink); }
@@ -83,7 +87,7 @@ input[type=range] { display: block; width: 100%; margin: 5px 0 0; accent-color: 
   .status { display: block; padding: 8px 12px; }
   .status p { font-size: 11px; }
   .score, .controls { padding: 10px 12px; }
-  .controls { gap: 12px; grid-template-columns: 1fr 1fr; }
-  #shoot { grid-column: 1/-1; }
+  .controls { gap: 8px; } .controls > div:first-child { flex: 1; }
+  #shoot { min-height: 44px; }
   .rules { grid-template-columns: 1fr; gap: 10px; margin-top: 20px; }
 }

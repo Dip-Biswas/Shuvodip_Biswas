@@ -1,10 +1,11 @@
-import { DESK, STEP, PENS, place, setup, flick, step, outcome, chooseShot } from './penfight-engine.js';
+import { DESK, STEP, PENS, place, setup, gripAt, flick, step, outcome, chooseShot } from './penfight-engine.js?v=grip1';
 
 const byId = id => document.getElementById(id);
 const desk = byId('desk');
 const context = desk.getContext('2d');
-const angleInput = byId('angle');
-const powerInput = byId('power');
+const coarse = window.matchMedia('(pointer: coarse)');
+let mode = coarse.matches ? 'touch' : 'mouse';
+let angle = 0, power = 75, keyboardAim = false;
 const shotButton = byId('shoot');
 const startButton = byId('start');
 const state = {
@@ -58,6 +59,18 @@ function drawPen(ctx, pen) {
   ctx.beginPath();
   ctx.roundRect(-half + 6, -radius + 2, brass ? 30 : 23, 3, 1.5);
   ctx.fill();
+  // Small material details remain visible when the pens turn or slide.
+  if (pen.type === 0) {
+    ctx.fillStyle = '#f4dfc9'; ctx.fillRect(-half+13, -3.8, 48, 7.6);
+    ctx.fillStyle = '#40251c'; ctx.fillRect(-half+13, -1.7, 46, 2.8);
+    ctx.fillStyle = '#ffffffaa'; ctx.fillRect(-half+15, -3.6, 43, 1);
+  } else if (pen.type === 2) {
+    ctx.fillStyle = '#644a24'; ctx.beginPath(); ctx.arc(half-9,0,1.5,0,2*Math.PI); ctx.fill();
+    ctx.fillStyle = '#ffdf93'; ctx.fillRect(-half+39,-radius+.5,1.1,2*radius-1);
+  } else if (pen.type === 3) {
+    ctx.fillStyle = '#ddd7c9'; ctx.fillRect(half-13,-2.5,9,5);
+    ctx.fillStyle = '#312a30'; ctx.fillRect(half-5,-1.3,5,2.6);
+  }
   ctx.restore();
 }
 
@@ -82,14 +95,24 @@ wood.save();
 wood.beginPath();
 wood.rect(edge, edge, surfaceWidth, surfaceHeight);
 wood.clip();
-for (let i = 0; i < 79; i++) {
-  const y = edge + i * 5.1;
-  wood.strokeStyle = i % 4 ? '#875b3614' : '#fff2d538';
-  wood.lineWidth = i % 3 ? 1 : 1.7;
+// A cut through a knot bends neighbouring growth lines together. Fine pores
+// and small breaks interrupt the grain instead of repeating a tiled image.
+let seed = 1741;
+function noise() { seed = (Math.imul(seed,1664525) + 1013904223) >>> 0; return seed / 4294967296; }
+for (let y = edge - 14; y < DESK.height; y += .8 + noise()*2.5) {
   wood.beginPath();
-  wood.moveTo(edge - 2, y);
-  wood.bezierCurveTo(240, y - 12 * Math.sin(i * .42), 510, y + 9 * Math.cos(i * .53), DESK.width - edge + 2, y + 4 * Math.sin(i));
+  wood.strokeStyle = noise() > .6 ? 'rgba(255,242,203,.28)' : 'rgba(103,62,31,.14)';
+  wood.lineWidth = .3 + noise()*1.1;
+  for (let x=edge; x<=DESK.width-edge+8; x+=8) {
+    const bend = (cx,cy) => 19*Math.exp(-((x-cx)**2)/7000)*Math.tanh((y-cy)/9)*Math.exp(-Math.abs(y-cy)/34);
+    const h = y + 3*Math.sin(x/138+y/62)+bend(180,118)+bend(618,312);
+    if(x===edge) wood.moveTo(x,h); else wood.lineTo(x,h);
+  }
   wood.stroke();
+}
+for (let i=0;i<2500;i++) {
+  wood.fillStyle = noise()>.45 ? '#693f241c' : '#fff7e228';
+  wood.fillRect(edge+noise()*surfaceWidth,edge+noise()*surfaceHeight,1+noise()*4,.5);
 }
 wood.restore();
 wood.strokeStyle = '#88623b';
@@ -115,10 +138,15 @@ function drawField() {
 }
 function drawGuide() {
   const pen = state.pens[0];
-  const radians = Number(angleInput.value) * Math.PI / 180;
-  const distance = 45 + Number(powerInput.value) * 1.3;
+  const grip = state.drag?.contact || pen;
   context.save();
-  context.translate(pen.x, pen.y);
+  context.translate(grip.x, grip.y);
+  context.strokeStyle = '#fff9e7';
+  context.lineWidth = 2;
+  context.beginPath(); context.arc(0, 0, state.drag ? 6 : 4, 0, Math.PI*2); context.stroke();
+  if ((!state.drag && !keyboardAim) || power < 1) { context.restore(); return; }
+  const radians = angle * Math.PI / 180;
+  const distance = 20 + power * 1.55;
   context.rotate(radians);
   context.strokeStyle = '#193e33';
   context.fillStyle = '#193e33';
@@ -161,13 +189,14 @@ PENS.forEach((spec, i) => {
   });
 });
 function setPhase(phase, title, message) {
+  clearGrip();
   state.phase = phase;
-  state.drag = null;
+  keyboardAim = false;
+  showPower(0);
   byId('turn').textContent = title;
   byId('message').textContent = message;
   desk.classList.toggle('aimable', phase === 'aim');
-  angleInput.disabled = powerInput.disabled = phase !== 'aim';
-  shotButton.disabled = !['aim', 'between', 'over'].includes(phase);
+  shotButton.hidden = !['between', 'over'].includes(phase);
   shotButton.textContent = phase === 'between' ? 'Next round ↗' : phase === 'over' ? 'Rematch ↗' : 'Flick pen ↗';
   byId('case').disabled = phase !== 'setup';
   startButton.textContent = phase === 'setup' ? 'Start match ↗' : phase === 'over' ? 'Choose pens' : 'End match & choose pens';
@@ -184,11 +213,20 @@ function prepare() {
   byId('cpu-type').textContent = PENS[state.opponent].name;
   setPhase('setup', 'Choose your pen', 'Start a match when you’re ready.');
 }
-function setAim(angle, power) {
-  angleInput.value = Math.round(angle);
-  powerInput.value = Math.round(power);
-  byId('angle-value').textContent = angleInput.value + '°';
-  byId('power-value').textContent = powerInput.value + '%';
+function describeInput(next) {
+  mode = next;
+  byId('input-mode').textContent = next === 'touch' ? 'Touch flick' : next === 'pen' ? 'Stylus flick' : 'Mouse flick';
+  byId('gesture').textContent = (next === 'mouse' ? 'Click and hold' : 'Press and hold') + ' your pen. Pull back, then release.';
+}
+describeInput(mode);
+coarse.addEventListener('change', () => describeInput(coarse.matches ? 'touch' : 'mouse'));
+function showPower(value) {
+  byId('power-value').value = Math.round(value) + '%';
+  byId('strength').value = value;
+}
+function setAim(degrees, amount) {
+  angle = degrees; power = Math.min(100, Math.max(0, amount));
+  showPower(state.drag || keyboardAim ? power : 0);
   drawField();
 }
 function startTurn(side) {
@@ -199,15 +237,15 @@ function startTurn(side) {
     return;
   }
   const [p, cpu] = state.pens;
-  setPhase('aim', 'Your turn', 'Drag back and release, or set your shot below.');
+  setPhase('aim', 'Your turn', 'Grip your pen in the middle for a straight shot, or near an end for spin.');
   setAim(Math.atan2(cpu.y - p.y, cpu.x - p.x) * 180 / Math.PI, 75);
 }
 function startRound() {
   state.pens = setup(state.selected, state.opponent, state.round);
   startTurn(state.round % 2);
 }
-function launch(radians, power) {
-  flick(state.pens[state.shooter], radians, power);
+function launch(radians, power, contact) {
+  flick(state.pens[state.shooter], radians, power, contact);
   setPhase('moving', state.shooter ? 'Shuvodip flicked' : 'You flicked', 'Waiting for the pens to settle.');
 }
 function finishTurn() {
@@ -223,7 +261,7 @@ function finishTurn() {
   }
 }
 function takeShot() {
-  if (state.phase === 'aim') launch(Number(angleInput.value) * Math.PI / 180, Number(powerInput.value) / 100);
+  if (state.phase === 'aim') launch(angle * Math.PI / 180, power / 100);
   else if (state.phase === 'between') { state.round++; startRound(); }
   else if (state.phase === 'over') { state.scores = [0, 0]; state.round = 0; startRound(); }
 }
@@ -234,48 +272,73 @@ startButton.addEventListener('click', () => {
   desk.focus({ preventScroll: true });
 });
 shotButton.addEventListener('click', takeShot);
-for (const slider of [angleInput, powerInput]) {
-  slider.addEventListener('input', () => setAim(Number(angleInput.value), Number(powerInput.value)));
+function point(e, box) {
+  return { x: (e.clientX-box.left)*DESK.width/box.width, y: (e.clientY-box.top)*DESK.height/box.height };
 }
-function point(event) {
-  const box = desk.getBoundingClientRect();
-  return { x: (event.clientX - box.left) * DESK.width / box.width,
-    y: (event.clientY - box.top) * DESK.height / box.height };
+function hit(e) {
+  const box = desk.getBoundingClientRect(), scale = DESK.width / box.width;
+  const pen = state.pens[0];
+  const pad = e.pointerType === 'touch' ? Math.max(4, 22*scale-PENS[pen.type].radius) : 4*scale;
+  return gripAt(pen, point(e,box), pad);
 }
-desk.addEventListener('pointerdown', event => {
-  if (state.phase !== 'aim' || state.drag || event.button !== 0) return;
-  event.preventDefault();
-  desk.focus({ preventScroll: true });
-  state.drag = { ...point(event), id: event.pointerId };
-  desk.setPointerCapture(event.pointerId);
-});
-function updateDrag(event) {
-  if (!state.drag || event.pointerId !== state.drag.id) return 0;
-  const p = point(event), dx = state.drag.x - p.x, dy = state.drag.y - p.y;
-  const distance = Math.hypot(dx, dy);
-  if (distance >= 5) setAim(Math.atan2(dy, dx) * 180 / Math.PI, Math.min(100, distance / 1.35));
-  return distance;
-}
-desk.addEventListener('pointermove', updateDrag);
-desk.addEventListener('pointerup', event => {
-  if (!state.drag || state.drag.id !== event.pointerId) return;
-  const distance = updateDrag(event);
+function clearGrip() {
+  const drag = state.drag;
   state.drag = null;
-  if (distance >= 8) takeShot();
+  if (drag && desk.hasPointerCapture(drag.id)) desk.releasePointerCapture(drag.id);
+  desk.classList.remove('can-grip','gripped');
+}
+function cancelGrip() {
+  if (!state.drag) return;
+  clearGrip(); showPower(0); drawField();
+}
+desk.addEventListener('pointerdown', e => {
+  if (state.phase !== 'aim' || state.drag || e.button !== 0 || !e.isPrimary) return;
+  describeInput(e.pointerType);
+  const contact = hit(e);
+  if (!contact) return;
+  e.preventDefault();
+  desk.focus({ preventScroll: true });
+  keyboardAim = false;
+  state.drag = {id:e.pointerId, x:e.clientX, y:e.clientY, contact,
+    travel:Math.max(52,Math.min(118,desk.getBoundingClientRect().width*.18))};
+  desk.setPointerCapture(e.pointerId); desk.classList.add('gripped');
+  setAim(angle, 0);
 });
-for (const name of ['pointercancel', 'lostpointercapture']) desk.addEventListener(name, () => { state.drag = null; });
-window.addEventListener('blur', () => { state.drag = null; });
-desk.addEventListener('keydown', event => {
-  if (state.phase !== 'aim') return;
-  if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', ' '].includes(event.key)) return;
-  event.preventDefault();
-  if (event.key === ' ') { if (!event.repeat) takeShot(); return; }
-  let angle = Number(angleInput.value), power = Number(powerInput.value);
-  if (event.key === 'ArrowLeft') angle -= 5;
-  if (event.key === 'ArrowRight') angle += 5;
-  if (event.key === 'ArrowUp') power += 5;
-  if (event.key === 'ArrowDown') power -= 5;
-  setAim(((angle + 540) % 360) - 180, power);
+function updateDrag(e) {
+  const d = state.drag;
+  const dx=d.x-e.clientX, dy=d.y-e.clientY, distance=Math.hypot(dx,dy);
+  const deadZone = e.pointerType === 'touch' ? 6 : 3;
+  setAim(Math.atan2(dy,dx)*180/Math.PI, 100*Math.max(0,distance-deadZone)/(d.travel-deadZone));
+}
+desk.addEventListener('pointermove', e => {
+  if (state.drag?.id === e.pointerId) updateDrag(e);
+  else if (!state.drag && e.pointerType === 'mouse' && state.phase === 'aim') {
+    if(mode!=='mouse') describeInput('mouse');
+    desk.classList.toggle('can-grip', Boolean(hit(e)));
+  }
+});
+desk.addEventListener('pointerup', e => {
+  if (state.drag?.id !== e.pointerId) return;
+  updateDrag(e);
+  const contact = state.drag.contact;
+  if (power >= 5) launch(angle*Math.PI/180, power/100, contact);
+  else cancelGrip();
+});
+for (const name of ['pointercancel','lostpointercapture']) desk.addEventListener(name, e => {
+  if (state.drag?.id === e.pointerId) cancelGrip();
+});
+desk.addEventListener('contextmenu', e => { if (state.drag) e.preventDefault(); });
+window.addEventListener('blur', cancelGrip);
+document.addEventListener('visibilitychange', () => { if (document.hidden) cancelGrip(); });
+desk.addEventListener('keydown', e => {
+  if(e.key==='Escape') { cancelGrip(); return; }
+  if (state.phase!=='aim' || state.drag || !['ArrowLeft','ArrowRight','ArrowUp','ArrowDown',' '].includes(e.key)) return;
+  e.preventDefault();
+  if (!keyboardAim && !power) power=75;
+  keyboardAim=true;
+  if(e.key===' ') { if(!e.repeat) takeShot(); return; }
+  const sign = e.key==='ArrowLeft' ? -5 : e.key==='ArrowRight' ? 5 : 0;
+  setAim(((angle+sign+540)%360)-180, Math.max(5, power+(e.key==='ArrowUp'?5:e.key==='ArrowDown'?-5:0)));
 });
 let last = 0, accumulator = 0;
 function frame(now) {

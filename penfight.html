@@ -6,8 +6,8 @@
   <meta name="theme-color" content="#203b33">
   <meta name="description" content="Choose a pen and challenge computer-controlled Shuvodip to a tabletop flicking game.">
   <title>Pen Fight with Shuvodip</title>
-  <link rel="stylesheet" href="penfight.css">
-  <script type="module" src="penfight.js"></script>
+  <link rel="stylesheet" href="penfight.css?v=grip1">
+  <script type="module" src="penfight.js?v=grip1"></script>
 </head>
 <body>
   <header><a class="monogram" href="index.html" aria-label="Shuvodip’s portfolio">sb.</a>
@@ -23,13 +23,13 @@
           <div class="numbers"><b id="your-score">0</b><i>–</i><b id="cpu-score">0</b></div>
           <div class="opponent"><strong>Shuvodip <span>CPU</span></strong><small id="cpu-type"></small></div></div>
         <div class="status"><b id="turn">Choose your pen</b><p role="status" aria-live="polite" id="message">Start a match when you’re ready.</p></div>
-        <canvas id="desk" width="840" height="450" tabindex="0" aria-label="Pen Fight desk. Drag back and release to flick your pen, or use the angle, power and flick controls below."></canvas>
-        <div class="controls"><label>Angle <output id="angle-value" for="angle">0°</output><input id="angle" type="range" min="-180" max="180" value="0"></label>
-          <label>Power <output id="power-value" for="power">75%</output><input id="power" type="range" min="5" max="100" value="75"></label>
-          <button class="primary" id="shoot" type="button" disabled>Flick pen ↗</button></div>
+        <canvas id="desk" width="840" height="450" tabindex="0" aria-label="Pen Fight desk. Hold your pen, pull back, then release to flick. Keyboard: arrow keys aim and adjust power; Space flicks."></canvas>
+        <div class="controls"><div><b id="input-mode">Mouse flick</b><p id="gesture"></p></div>
+          <div class="force"><span>Flick power <output id="power-value">0%</output></span><meter id="strength" min="0" max="100" value="0" aria-label="Flick power"></meter></div>
+          <button class="primary" id="shoot" type="button" hidden>Next round ↗</button></div>
       </section>
     </div>
-    <section class="rules"><h2>How to play</h2><p><b>Flick.</b> On your turn, drag back anywhere on the desk. The arrow shows where your pen will go. Release to shoot.</p><p><b>Knock out.</b> A pen falls when its centre crosses the desk edge. If both pens fall on one flick, replay the round.</p><p><b>Use the keyboard.</b> Focus the desk. Left and right adjust aim, up and down adjust power, and Space flicks.</p></section>
+    <section class="rules"><h2>How to play</h2><p><b>Flick.</b> Hold your pen and pull away from your target. Release to flick along the arrow. Grip the middle for a straight push, or either end for spin.</p><p><b>Knock out.</b> A pen falls when its centre crosses the desk edge. If both pens fall on one flick, replay the round.</p><p><b>Use the keyboard.</b> Focus the desk. Left and right adjust aim, up and down adjust power, and Space flicks.</p></section>
   </main>
 </body>
 </html>

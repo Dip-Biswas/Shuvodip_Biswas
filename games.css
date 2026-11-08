@@ -1,0 +1,36 @@
+:root { color-scheme: light; --paper: #f4f1e9; --ink: #203b33; --rust: #a7492d; --rule: #bec6b9; }
+* { box-sizing: border-box; }
+body { margin: 0; color: var(--ink); background: var(--paper); font: 15px/1.5 Arial,sans-serif; }
+.topbar, main { width: min(1160px, 100% - 2 * clamp(16px, 4vw, 52px)); margin: auto; }
+.topbar { display: flex; align-items: center; gap: 26px; height: 78px; border-bottom: 1px solid var(--rule); }
+.topbar a, .player-nav a { color: inherit; font-size: 13px; text-decoration: none; }
+.topbar .brand { font: italic 47px/1 Georgia,serif; letter-spacing: -4px; }
+a:focus-visible { outline: 3px solid var(--rust); outline-offset: 4px; }
+a:hover { color: var(--rust); }
+.intro { display: flex; justify-content: space-between; align-items: end; gap: 32px; padding: clamp(36px,6vw,78px) 0 32px; }
+h1,h2,p { margin: 0; }
+.intro h1 { font: 400 clamp(46px,6.5vw,89px)/.94 Georgia,serif; letter-spacing: -.065em; }
+.intro em { display: block; color: var(--rust); }
+.intro p { max-width: 300px; color: #495e50; }
+.games { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 26px; margin-bottom: 60px; }
+.game { display: flex; flex-direction: column; color: var(--ink); text-decoration: none; background: #fffcf4; border: 1px solid var(--rule); }
+.game:hover, .game:focus-visible { border-color: var(--ink); color: var(--ink); }
+.game img { width: 100%; height: auto; display: block; aspect-ratio: 72/35; border-bottom: 1px solid var(--rule); }
+.card-copy { flex: 1; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding: 20px 24px; }
+.card-copy h2 { font: 36px/1.1 Georgia,serif; letter-spacing: -.04em; }
+.card-copy p { max-width: 42ch; color: #495e50; font-size: 14px; padding-bottom: 10px; }
+.card-copy span { margin-top: auto; font-weight: bold; border-bottom: 1px solid currentColor; }
+.card-copy b { margin-left: 8px; }
+.player-nav { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; padding: 18px 0; }
+.player-nav h1 { font: 29px/1.1 Georgia,serif; }
+#direct { margin-left: auto; text-decoration: underline; text-underline-offset: 3px; }
+#stage iframe { display: block; border: 0; width: 100%; height: 650px; }
+@media (max-width: 700px) {
+  .topbar { height: 60px; }
+  .intro { display: block; }
+  .intro p { margin-top: 18px; }
+  .games { grid-template-columns: 1fr; gap: 18px; }
+  .card-copy { padding: 16px 18px; }
+  .player-nav h1 { order: 1; flex-basis: 100%; }
+  #player { margin-inline: -10px; }
+}

@@ -8,10 +8,11 @@
   <title>Pen Fight with Shuvodip</title>
   <link rel="stylesheet" href="penfight.css?v=grip1">
   <script type="module" src="penfight.js?v=motion2"></script>
-</head>
+<script>if (window.self !== window.top && new URLSearchParams(location.search).get('view') === 'games') document.documentElement.classList.add('in-games');</script>
+<style>.in-games body{display:flow-root}.in-games header,.in-games footer{display:none}.in-games #pitch{height:auto;min-height:0}</style></head>
 <body>
   <header><a class="monogram" href="index.html" aria-label="Shuvodip’s portfolio">sb.</a>
-    <a href="index.html#offclock">↖ Back to portfolio</a><a class="other-game" href="headball.html">Play Headball ↗</a></header>
+    <a href="play-games-with-me.html">← Play Games With Me</a></header>
   <main>
     <div class="heading"><h1>Pen <em>Fight.</em></h1><p>Pick a pen and flick it across the desk. Knock Shuvodip’s pen off the edge to score. First to three wins.</p></div>
     <div class="layout">

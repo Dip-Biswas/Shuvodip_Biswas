@@ -2,9 +2,10 @@
 <html lang="en">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#203b33"><meta name="description" content="A quick game of Headball against computer-controlled Shuvodip. Jump, kick, and score in a 90-second match."><title>Headball with Shuvodip</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='52' font-size='52'%3E⚽%3C/text%3E%3C/svg%3E">
-<link rel="stylesheet" href="headball.css"><script defer src="headball-engine.js"></script><script defer src="headball.js"></script></head>
+<link rel="stylesheet" href="headball.css"><script defer src="headball-engine.js"></script><script defer src="headball.js"></script><script>if (window.self !== window.top && new URLSearchParams(location.search).get('view') === 'games') document.documentElement.classList.add('in-games');</script>
+<style>.in-games body{display:flow-root}.in-games header,.in-games footer{display:none}.in-games #pitch{height:auto;min-height:0}</style></head>
 <body><a class="skip" href="#game">Skip to game</a><div class="page">
-<header><a class="brand" href="index.html" aria-label="Shuvodip Biswas portfolio">sb.</a><a class="back" href="index.html#offclock">↖ Back to the portfolio</a><span class="edition">OFF THE CLOCK / ARCADE 01</span></header>
+<header><a class="brand" href="index.html" aria-label="Shuvodip Biswas portfolio">sb.</a><a class="back" href="play-games-with-me.html">← Play Games With Me</a><span class="edition">OFF THE CLOCK / ARCADE 01</span></header>
 <main><section class="intro" aria-labelledby="title"><div><p class="eyebrow">A little friendly competition</p><h1 id="title">Got a minute? <em>Take a shot.</em></h1></div><p class="intro-note">One ball. Two oversized heads.<br>Beat a computer-controlled version of me.<br><span>No sign-up. Just a quick match.</span></p></section>
 <section class="arcade" id="game" aria-label="Headball game">
 <div class="match-bar"><div class="match-title"><span class="live-dot"></span><strong>HEADBALL</strong><span class="rules">90 seconds · first to 5</span></div><div class="options"><label for="difficulty">Pace</label><select id="difficulty"><option value="casual">Friendly</option><option value="challenge">Bring it on</option></select><button id="sound" aria-pressed="false" aria-label="Turn sound on">Sound off</button></div></div>

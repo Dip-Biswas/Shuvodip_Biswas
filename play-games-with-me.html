@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#203b33">
+  <title>Play Games With Me | Shuvodip Biswas</title>
+  <meta name="description" content="Pick a game and play a computer-controlled Shuvodip in a Headball match or a tabletop Pen Fight.">
+  <link rel="stylesheet" href="games.css">
+  <script defer src="games.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html" aria-label="Shuvodip Biswas, portfolio home">sb.</a>
+    <a href="index.html#offclock">↖ Back to portfolio</a>
+  </header>
+  <main>
+    <section id="picker" aria-labelledby="page-title">
+      <div class="intro">
+        <h1 id="page-title">Play Games <em>With Me</em></h1>
+        <p>Meet me on the pitch or across the desk. Pick a game to challenge the computer-controlled version of me.</p>
+      </div>
+      <div class="games">
+        <a class="game" data-game="headball" href="headball.html" aria-label="Play Headball">
+          <img src="headball-preview.webp" width="720" height="350" alt="">
+          <div class="card-copy"><h2>Headball</h2><p>Jump for a header or line up a kick. Score five goals or lead when the 90 seconds are up.</p><span>Play Headball <b aria-hidden="true">→</b></span></div>
+        </a>
+        <a class="game" data-game="penfight" href="penfight.html" aria-label="Play Pen Fight">
+          <img src="penfight-preview.webp" width="720" height="350" alt="">
+          <div class="card-copy"><h2>Pen Fight</h2><p>Choose a pen and flick mine off the desk. A grip near the tip adds spin. First to three wins.</p><span>Play Pen Fight <b aria-hidden="true">→</b></span></div>
+        </a>
+      </div>
+    </section>
+    <section id="player" hidden aria-labelledby="playing-title">
+      <div class="player-nav">
+        <a id="return" href="play-games-with-me.html">← Choose another game</a>
+        <h1 id="playing-title" tabindex="-1"></h1>
+        <a id="direct" href="headball.html">Open game separately ↗</a>
+      </div>
+      <div id="stage"></div>
+    </section>
+  </main>
+</body>
+</html>
